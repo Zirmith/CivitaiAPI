@@ -32,23 +32,62 @@ civitai.getCreators()
   });
 ```
 
--Methods
-getCreators(options): Fetch a list of creators.
+## Methods
 
-getImages(options): Fetch a list of images.
+### `getCreators(options)`
 
-getModels(options): Fetch a list of models.
+Fetch a list of creators.
 
-getModelById(modelId): Fetch a model by its ID.
+### `getImages(options)`
 
-getModelVersionById(modelVersionId): Fetch a model version by its ID.
+Fetch a list of images.
 
-getModelVersionByHash(hash): Fetch a model version by its hash.
+### `getModels(options)`
 
-getTags(options): Fetch a list of tags.
+Fetch a list of models.
 
-Contributing
-Contributions are welcome! If you'd like to improve this wrapper or add new features, please open an issue or submit a pull request.
+### `getModelById(modelId)`
+
+Fetch a model by its ID.
+
+### `getModelVersionById(modelVersionId)`
+
+Fetch a model version by its ID.
+
+### `getModelVersionByHash(hash)`
+
+Fetch a model version by its hash.
+
+### `getTags(options)`
+
+Fetch a list of tags.
+
+## Contributing
+
+Contributions Welcome!
+
+If you'd like to contribute to this wrapper or add new features, please follow these steps:
+
+1. Open an issue to discuss the proposed changes or improvements.
+
+2. Fork the repository on GitHub.
+
+3. Create a new branch for your feature or bug fix.
+
+4. Implement your changes and write tests if applicable.
+
+5. Ensure that your code follows best practices and is well-documented.
+
+6. Test your changes thoroughly.
+
+7. Create a pull request (PR) with a clear description of the changes you've made.
+
+8. Your PR will be reviewed, and any necessary feedback will be provided.
+
+9. Once your PR is approved, it will be merged into the main branch.
+
+Thank you for contributing to this project!
+
 
 ## Examples
 See `src/examples/` .
