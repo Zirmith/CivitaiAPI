@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "A Node.js wrapper for the Civitai API",
   "main": "civitai.js",
+  "homepage": "https://github.com/Zirmith/CivitaiAPI/blob/main/README.md",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,9 +11,7 @@
     "type": "git",
     "url": "https://github.com/Zirmith/CivitaiAPI.git"
   },
-  "publishConfig": {
-    "registry": "https://github.com/Zirmith/CivitaiAPI.git"
-  },
+  
   "keywords": ["civitai", "api", "wrapper", "node.js"],
   "author": "Zirmith",
   "license": "MIT",
