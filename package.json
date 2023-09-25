@@ -1,14 +1,18 @@
 {
-  "name": "civitaiapi",
+  "name": "civitai-api-wrapper",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Node.js wrapper for the Civitai API",
   "main": "civitai.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zirmith/CivitaiAPI.git"
+  },
+  "keywords": ["civitai", "api", "wrapper", "node.js"],
+  "author": "Zirmith",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.5.0",
     "fs": "^0.0.1-security",
