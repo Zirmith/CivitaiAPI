@@ -5,6 +5,10 @@ This is a Node.js wrapper for the Civitai API, allowing you to interact with Civ
 ## Installation
 
 To use this wrapper in your Node.js project, you can install it via npm or yarn:
+**Installation requires Node.js 10.9.0 or higher.**
+
+![NPM](https://nodei.co/npm/civitai-api-wrapper.png)
+[![Known Vulnerabilities](https://snyk.io/test/github/zirmith/CivitaiAPI/badge.svg)](https://snyk.io/test/github/zirmith/CivitaiAPI)   [![HitCount](https://hits.dwyl.com/Zirmith/CivitaiAPI.svg?style=flat-square&show=unique)](http://hits.dwyl.com/Zirmith/CivitaiAPI)
 
 ```bash
 npm install civitai-api-wrapper
@@ -45,5 +49,5 @@ getTags(options): Fetch a list of tags.
 Contributing
 Contributions are welcome! If you'd like to improve this wrapper or add new features, please open an issue or submit a pull request.
 
-License
-This wrapper is open-source and available under the MIT License.
+## Examples
+See `src/examples/` .
