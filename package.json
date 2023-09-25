@@ -1,7 +1,7 @@
 {
   "name": "civitai-api-wrapper",
-  "version": "1.0.3",
-  "description": "A Node.js wrapper for the Civitai API",
+  "version": "1.0.4",
+  "description": "An advanced and robust Node.js library that serves as a comprehensive wrapper for seamless integration with the Civitai API. Designed to enhance your development experience, this library offers features such as automatic rate limit handling, request retries, and cache persistence to ensure reliability and performance. Simplify your interactions with the Civitai API and optimize your application's data retrieval processes with this professional-grade Node.js wrapper.",
   "main": "civitai.js",
   "homepage": "https://github.com/Zirmith/CivitaiAPI/blob/main/README.md",
   "scripts": {
@@ -11,13 +11,19 @@
     "type": "git",
     "url": "https://github.com/Zirmith/CivitaiAPI.git"
   },
-  
-  "keywords": ["civitai", "api", "wrapper", "node.js"],
+  "keywords": [
+    "civitai",
+    "api",
+    "wrapper",
+    "node.js"
+  ],
   "author": "Zirmith",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.5.0",
+    "axios-retry": "^3.8.0",
     "fs": "^0.0.1-security",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.6"
   }
 }

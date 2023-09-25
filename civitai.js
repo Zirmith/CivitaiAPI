@@ -1,195 +1,235 @@
 const axios = require('axios');
-
-
+const sqlite3 = require('sqlite3').verbose();
+const axiosRetry = require('axios-retry');
 
 class CivitaiAPI {
   constructor() {
     this.baseURL = 'https://civitai.com/api/v1';
+    // Configure Axios with retries
+    axiosRetry(axios, {
+      retries: 3, // Number of retry attempts
+      retryDelay: axiosRetry.exponentialDelay, // Exponential backoff delay
+      retryCondition: (error) => {
+        return error.response && error.response.status === 429; // Retry only on rate limit exceeded
+      },
+    });
+     // Configure SQLite database for cache persistence
+     this.db = new sqlite3.Database('civitai_cache.db', (err) => {
+      if (err) {
+        console.error('Error opening SQLite database:', err.message);
+      } else {
+        // Check if the 'cache' table exists
+        this.db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='cache'", (err, row) => {
+          if (err) {
+            console.error('Error checking for table existence:', err.message);
+          } else if (!row) {
+            // The 'cache' table doesn't exist, create it
+            this.createCacheTable();
+            console.log('Warning: If you see the error "Error: SQLITE_ERROR: no such table: cache" in the logs, it is normal. The table will be created on first use.');
+          } else {
+            console.log('Connected to database');
+          }
+        });
+      }
+    });
   }
 
-  /**
-   * Get a list of creators from the Civitai API.
-   *
-   * @param {Object} options - Optional query parameters (limit, page, query).
-   * @returns {Promise<Object[]>} - A Promise that resolves to an array of creators.
-   */
+  createCacheTable() {
+    this.db.run(`
+      CREATE TABLE IF NOT EXISTS cache (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        timestamp INTEGER
+      )
+    `);
+  }
+
+
+  async getCachedData(key) {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT value FROM cache WHERE key = ?', [key], (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row ? JSON.parse(row.value) : null);
+        }
+      });
+    });
+  }
+
+  async setCachedData(key, data) {
+    const timestamp = Date.now();
+    const value = JSON.stringify(data);
+
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'REPLACE INTO cache (key, value, timestamp) VALUES (?, ?, ?)',
+        [key, value, timestamp],
+        (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+  }
+
   async getCreators(options = {}) {
-    const { limit = 20, page = 1, query = '' } = options;
+    const cacheKey = `getCreators-${JSON.stringify(options)}`;
+    const cachedData = await this.getCachedData(cacheKey);
+
+    if (cachedData) {
+      console.log('Using cached data for getCreators');
+      return cachedData;
+    }
 
     try {
       const response = await axios.get(`${this.baseURL}/creators`, {
-        params: { limit, page, query },
+        params: { ...options },
       });
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch creators: ${error.message}`);
     }
   }
 
-/**
-   * Get a list of images from the Civitai API.
-   *
-   * @param {Object} options - Optional query parameters (limit, postId, modelId, modelVersionId, username, nsfw, sort, period, page).
-   * @returns {Promise<Object[]>} - A Promise that resolves to an array of images.
-   */
-async getImages(options = {}) {
-    const {
-      limit = 100,
-      postId,
-      modelId,
-      modelVersionId,
-      username,
-      nsfw,
-      sort,
-      period,
-      page = 1,
-    } = options;
+  async getImages(options = {}) {
+    const cacheKey = `getImages-${JSON.stringify(options)}`;
+    const cachedData = await this.getCachedData(cacheKey);
+
+    if (cachedData) {
+      console.log('Using cached data for getImages');
+      return cachedData;
+    }
 
     try {
       const response = await axios.get(`${this.baseURL}/images`, {
-        params: {
-          limit,
-          postId,
-          modelId,
-          modelVersionId,
-          username,
-          nsfw,
-          sort,
-          period,
-          page,
-        },
+        params: { ...options },
       });
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch images: ${error.message}`);
     }
   }
 
   async getModels(options = {}) {
-    const {
-      limit = 100,
-      page = 1,
-      query = '',
-      tag = '',
-      types = [],
-      sort = 'Highest Rated',
-      period = 'AllTime',
-      rating = undefined,
-      favorites = false,
-      hidden = false,
-      primaryFileOnly = false,
-      allowNoCredit = false,
-      allowDerivatives = false,
-      allowDifferentLicenses = false,
-      allowCommercialUse = 'None',
-      nsfw = true,
-    } = options;
+    const cacheKey = `getModels-${JSON.stringify(options)}`;
+    const cachedData = await this.getCachedData(cacheKey);
+
+    if (cachedData) {
+      console.log('Using cached data for getModels');
+      return cachedData;
+    }
 
     try {
       const response = await axios.get(`${this.baseURL}/models`, {
-        params: {
-          limit,
-          page,
-          query,
-          tag,
-          types: types.join(','),
-          sort,
-          period,
-          rating,
-          favorites,
-          hidden,
-          primaryFileOnly,
-          allowNoCredit,
-          allowDerivatives,
-          allowDifferentLicenses,
-          allowCommercialUse,
-          nsfw,
-        },
+        params: { ...options },
       });
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch models: ${error.message}`);
     }
   }
 
+  async getModelById(modelId) {
+    const cacheKey = `getModelById-${modelId}`;
+    const cachedData = await this.getCachedData(cacheKey);
 
+    if (cachedData) {
+      console.log('Using cached data for getModelById');
+      return cachedData;
+    }
 
-    /**
-   * Get a model by its ID from the Civitai API.
-   *
-   * @param {number} modelId - The ID of the model to retrieve.
-   * @returns {Promise<Object>} - A Promise that resolves to the model data.
-   */
-    async getModelById(modelId) {
-        try {
-          const response = await axios.get(`${this.baseURL}/models/${modelId}`);
-    
-          return response.data;
-        } catch (error) {
-          throw new Error(`Failed to fetch model: ${error.message}`);
-        }
-      }
+    try {
+      const response = await axios.get(`${this.baseURL}/models/${modelId}`);
 
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
 
-        /**
-   * Get a model version by its ID from the Civitai API.
-   *
-   * @param {number} modelVersionId - The ID of the model version to retrieve.
-   * @returns {Promise<Object>} - A Promise that resolves to the model version data.
-   */
+      return responseData;
+    } catch (error) {
+      throw new Error(`Failed to fetch model: ${error.message}`);
+    }
+  }
+
   async getModelVersionById(modelVersionId) {
+    const cacheKey = `getModelVersionById-${modelVersionId}`;
+    const cachedData = await this.getCachedData(cacheKey);
+
+    if (cachedData) {
+      console.log('Using cached data for getModelVersionById');
+      return cachedData;
+    }
+
     try {
       const response = await axios.get(`${this.baseURL}/model-versions/${modelVersionId}`);
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch model version: ${error.message}`);
     }
   }
 
+  async getModelVersionByHash(hash) {
+    const cacheKey = `getModelVersionByHash-${hash}`;
+    const cachedData = await this.getCachedData(cacheKey);
 
-   /**
-   * Get a model version by its hash from the Civitai API.
-   *
-   * @param {string} hash - The hash of the model version to retrieve.
-   * @returns {Promise<Object>} - A Promise that resolves to the model version data.
-   */
-   async getModelVersionByHash(hash) {
+    if (cachedData) {
+      console.log('Using cached data for getModelVersionByHash');
+      return cachedData;
+    }
+
     try {
       const response = await axios.get(`${this.baseURL}/model-versions/by-hash/${hash}`);
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch model version by hash: ${error.message}`);
     }
   }
 
-  /**
-   * Get a list of tags from the Civitai API.
-   *
-   * @param {Object} options - Optional query parameters (limit, page, query).
-   * @returns {Promise<Object[]>} - A Promise that resolves to an array of tags.
-   */
   async getTags(options = {}) {
-    const { limit = 20, page = 1, query = '' } = options;
+    const cacheKey = `getTags-${JSON.stringify(options)}`;
+    const cachedData = await this.getCachedData(cacheKey);
+
+    if (cachedData) {
+      console.log('Using cached data for getTags');
+      return cachedData;
+    }
 
     try {
       const response = await axios.get(`${this.baseURL}/tags`, {
-        params: { limit, page, query },
+        params: { ...options },
       });
 
-      return response.data;
+      const responseData = response.data;
+      await this.setCachedData(cacheKey, responseData);
+
+      return responseData;
     } catch (error) {
       throw new Error(`Failed to fetch tags: ${error.message}`);
     }
   }
-    
-
-  
-
 }
 
 module.exports = CivitaiAPI;
