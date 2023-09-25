@@ -15,6 +15,9 @@ To use this wrapper in your Node.js project, you can install it via npm or yarn:
 npm install civitai-api-wrapper
 # or
 yarn add civitai-api-wrapper
+
+# latest
+npm install civitai-api-wrapper@latest
 ```
 
 ```js
