@@ -1,7 +1,7 @@
 # Civitai API Wrapper
 
 # Description: 
-"An advanced and robust Node.js library that serves as a comprehensive wrapper for seamless integration with the Civitai API. Designed to enhance your development experience, this library offers features such as automatic rate limit handling, request retries, and cache persistence to ensure reliability and performance. Simplify your interactions with the Civitai API and optimize your application's data retrieval processes with this professional-grade Node.js wrapper.",
+"An advanced and robust Node.js library that serves as a comprehensive wrapper for seamless integration with the Civitai API. Designed to enhance your development experience, this library offers features such as automatic rate limit handling, request retries, and cache persistence to ensure reliability and performance. Simplify your interactions with the Civitai API and optimize your application's data retrieval processes with this professional-grade Node.js wrapper."
 
 ## Installation
 
